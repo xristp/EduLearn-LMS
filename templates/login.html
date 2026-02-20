@@ -12,16 +12,18 @@
 
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
-                <form method="POST" action="{{ url_for('login') }}">
+                <form method="POST" action="{{ url_for('login') }}" aria-label="Φόρμα σύνδεσης">
                     <div class="mb-3">
                         <label for="username" class="form-label">Όνομα Χρήστη</label>
                         <input type="text" class="form-control" id="username"
-                               name="username" placeholder="π.χ. teacher" required autofocus>
+                               name="username" placeholder="π.χ. teacher" required autofocus
+                               autocomplete="username">
                     </div>
                     <div class="mb-4">
                         <label for="password" class="form-label">Κωδικός</label>
                         <input type="password" class="form-control" id="password"
-                               name="password" placeholder="Εισάγετε τον κωδικό σας" required>
+                               name="password" placeholder="Εισάγετε τον κωδικό σας" required
+                               autocomplete="current-password">
                     </div>
                     <button type="submit" class="btn btn-primary w-100 mb-3">
                         Σύνδεση

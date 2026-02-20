@@ -12,35 +12,42 @@
 
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
-                <form method="POST" action="{{ url_for('register') }}">
+                <form method="POST" action="{{ url_for('register') }}" aria-label="Φόρμα εγγραφής">
                     <div class="mb-3">
                         <label for="full_name" class="form-label">Ονοματεπώνυμο</label>
                         <input type="text" class="form-control" id="full_name" name="full_name"
-                               placeholder="π.χ. Γιάννης Παπαδόπουλος" required>
+                               placeholder="π.χ. Γιάννης Παπαδόπουλος" required
+                               autocomplete="name">
                     </div>
 
                     <div class="mb-3">
                         <label for="username" class="form-label">Όνομα Χρήστη</label>
                         <input type="text" class="form-control" id="username" name="username"
-                               placeholder="Επιλέξτε username" required>
+                               placeholder="Επιλέξτε username" required
+                               autocomplete="username">
                     </div>
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email"
-                               placeholder="example@unipi.gr">
+                               placeholder="example@unipi.gr"
+                               autocomplete="email">
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-6">
                             <label for="password" class="form-label">Κωδικός</label>
                             <input type="password" class="form-control" id="password" name="password"
-                                   placeholder="6+ χαρακτήρες" required minlength="6">
+                                   placeholder="6+ χαρακτήρες" required minlength="6"
+                                   autocomplete="new-password"
+                                   aria-describedby="password-help">
+                            <div id="password-help" class="form-text sr-only">Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες</div>
                         </div>
                         <div class="col-6">
                             <label for="confirm_password" class="form-label">Επιβεβαίωση</label>
                             <input type="password" class="form-control" id="confirm_password"
-                                   name="confirm_password" placeholder="Ξανά ο κωδικός" required>
+                                   name="confirm_password" placeholder="Ξανά ο κωδικός" required
+                                   autocomplete="new-password">
                         </div>
                     </div>
 
