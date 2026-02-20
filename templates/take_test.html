@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ test.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+                    <span class="card-header-icon"><i class="bi bi-pencil-square"></i></span>
+                    {{ test.title }}
+                </h5>
+                <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size:.8125rem;">
+                    <i class="bi bi-clock me-1"></i>{{ test.duration_minutes }} λεπτά
+                </span>
+            </div>
+            <div class="card-body">
+                {% if test.description %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>{{ test.description }}
+                </div>
+                {% endif %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Προσοχή:</strong> Μπορείτε να υποβάλετε το τεστ μόνο μία φορά. Βεβαιωθείτε ότι έχετε απαντήσει σε όλες τις ερωτήσεις.
+                </div>
+            </div>
+        </div>
+
+        <form method="POST" id="testForm">
+            {% for q in questions %}
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h6 class="fw-bold">
+                            <span class="badge bg-primary me-2">{{ loop.index }}</span>
+                            {{ q.question_text }}
+                        </h6>
+                        <span class="badge bg-light text-dark">{{ q.points }} μον.</span>
+                    </div>
+
+                    {% if q.question_type == 'multiple_choice' or q.question_type == 'true_false' %}
+                    <!-- Ερωτήσεις πολλαπλής επιλογής / Σωστό-Λάθος -->
+                    {% for option in q.options_list %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="radio"
+                               name="answer_{{ q.id }}" id="q{{ q.id }}_opt{{ loop.index }}"
+                               value="{{ option }}" required>
+                        <label class="form-check-label" for="q{{ q.id }}_opt{{ loop.index }}">
+                            {{ option }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                    {% elif q.question_type == 'short_answer' %}
+                    <!-- Σύντομη Απάντηση -->
+                    <div class="mt-2">
+                        <input type="text" class="form-control" name="answer_{{ q.id }}"
+                               placeholder="Γράψτε την απάντησή σας..." required>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-2">
+                        <span class="badge bg-secondary">
+                            {% if q.question_type == 'multiple_choice' %}Πολλαπλής Επιλογής
+                            {% elif q.question_type == 'true_false' %}Σωστό/Λάθος
+                            {% else %}Σύντομης Απάντησης{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-4">
+                    <p class="text-muted mb-3">Ελέγξτε τις απαντήσεις σας πριν την υποβολή.</p>
+                    <button type="submit" class="btn btn-success btn-lg" onclick="return confirm('Είστε σίγουρος/η ότι θέλετε να υποβάλετε το τεστ;')">
+                        <i class="bi bi-send me-2"></i>Υποβολή Τεστ
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

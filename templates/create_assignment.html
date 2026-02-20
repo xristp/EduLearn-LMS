@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Νέα Εργασία{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('assignments', course_id=course.id) }}">Εργασίες</a></li>
+        <li class="breadcrumb-item active">Νέα Εργασία</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+                    <span class="card-header-icon"><i class="bi bi-clipboard-plus"></i></span>
+                    Νέα Εργασία
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-semibold">Τίτλος *</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-semibold">Περιγραφή / Οδηγίες</label>
+                        <textarea class="form-control" id="description" name="description" rows="6"
+                                  placeholder="Περιγράψτε τι ζητάτε στην εργασία..."></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="due_date" class="form-label fw-semibold">Προθεσμία</label>
+                            <input type="date" class="form-control" id="due_date" name="due_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="max_grade" class="form-label fw-semibold">Μέγιστος Βαθμός</label>
+                            <input type="number" class="form-control" id="max_grade" name="max_grade"
+                                   value="100" min="1" max="100">
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Δημιουργία
+                        </button>
+                        <a href="{{ url_for('assignments', course_id=course.id) }}" class="btn btn-outline-secondary">Ακύρωση</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

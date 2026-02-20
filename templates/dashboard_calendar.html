@@ -1,0 +1,61 @@
+{# Calendar widget: syncs with events + assignment due dates #}
+<div class="card border-0 shadow-sm mb-4 dashboard-calendar-card">
+    <div class="card-body p-3">
+        <h6 class="fw-semibold small text-muted text-uppercase mb-2" style="letter-spacing:.04em;">
+            <i class="bi bi-calendar3 me-1"></i>Ημερολόγιο
+        </h6>
+        <div class="dashboard-calendar-header">
+            <span class="dashboard-calendar-month">{{ cal_month_name }} {{ cal_year }}</span>
+        </div>
+        <div class="dashboard-calendar-grid">
+            <div class="dashboard-calendar-weekdays">
+                <span>Δε</span><span>Τρ</span><span>Τε</span><span>Πε</span><span>Πα</span><span>Σα</span><span>Κυ</span>
+            </div>
+            <div class="dashboard-calendar-days">
+                {% for _ in range(cal_first_weekday) %}
+                <span class="dashboard-calendar-day dashboard-calendar-day-empty"></span>
+                {% endfor %}
+                {% for day_info in cal_days_list %}
+                {% set date_str = day_info.date_str %}
+                {% set day_items = calendar_by_date.get(date_str, []) %}
+                {% set ns = namespace(has_event=false, has_assignment=false) %}
+                {% for it in day_items %}
+                    {% if it.type == 'event' %}{% set ns.has_event = true %}{% endif %}
+                    {% if it.type == 'assignment' %}{% set ns.has_assignment = true %}{% endif %}
+                {% endfor %}
+                <span class="dashboard-calendar-day {% if day_items %}dashboard-calendar-day-busy{% endif %}" title="{{ date_str }}{% if day_items %}: {{ day_items|length }} στοιχεία{% endif %}">
+                    <span class="dashboard-calendar-day-num">{{ day_info.day }}</span>
+                    {% if day_items %}
+                    <span class="dashboard-calendar-dots" title="{% for it in day_items %}{{ it.title }} ({{ it.course_name }}){% if not loop.last %} · {% endif %}{% endfor %}">
+                        {% if ns.has_event %}<span class="dashboard-calendar-dot dashboard-calendar-dot-event"></span>{% endif %}
+                        {% if ns.has_assignment %}<span class="dashboard-calendar-dot dashboard-calendar-dot-assignment"></span>{% endif %}
+                    </span>
+                    {% endif %}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="dashboard-calendar-upcoming mt-3">
+            <div class="fw-semibold small text-muted mb-2" style="letter-spacing:.02em;">Προσεχής δραστηριότητα</div>
+            {% if calendar_items %}
+            <ul class="list-unstyled mb-0 dashboard-calendar-list">
+                {% for it in calendar_items[:10] %}
+                <li class="dashboard-calendar-item">
+                    <a href="{{ it.url }}" class="text-decoration-none d-flex align-items-start gap-2 py-1">
+                        <span class="dashboard-calendar-item-type {% if it.type == 'event' %}dashboard-calendar-type-event{% else %}dashboard-calendar-type-assignment{% endif %}" title="{% if it.type == 'event' %}Συμβάν{% else %}Λήξη εργασίας{% endif %}">
+                            {% if it.type == 'event' %}<i class="bi bi-calendar-event"></i>{% else %}<i class="bi bi-clipboard"></i>{% endif %}
+                        </span>
+                        <span class="flex-grow-1 min-width-0">
+                            <span class="d-block small text-dark text-truncate">{{ it.title }}</span>
+                            <span class="d-block text-muted" style="font-size:.7rem;">{{ it.date }} · {{ it.course_name }}</span>
+                        </span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted small mb-0">Δεν υπάρχουν συμβάντα ή ληξιπρόθεσμες εργασίες τα επόμενα 3 μήνες.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

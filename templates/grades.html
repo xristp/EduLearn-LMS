@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Βαθμολογίες - {{ course.name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item active">{{ course.name }}</li>
+        <li class="breadcrumb-item active">Βαθμολογίες</li>
+    </ol>
+</nav>
+
+<div class="page-header mb-4">
+    <h1 class="page-title">Οι Βαθμολογίες μου</h1>
+    <p class="page-subtitle">{{ course.name }} — Οι βαθμολογίες σας είναι ορατές μόνο σε εσάς.</p>
+</div>
+</div>
+
+<!-- Βαθμοί Εργασιών -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header">
+        <h5 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+            <span class="card-header-icon"><i class="bi bi-clipboard-check"></i></span>
+            Εργασίες
+        </h5>
+    </div>
+    {% if assignment_grades %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Εργασία</th>
+                    <th>Ημ/νία Υποβολής</th>
+                    <th>Βαθμός</th>
+                    <th>Σχόλια</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in assignment_grades %}
+                <tr>
+                    <td class="fw-semibold">{{ g.title }}</td>
+                    <td>{{ g.submitted_at[:10] if g.submitted_at else '-' }}</td>
+                    <td>
+                        {% if g.grade is not none %}
+                        <span class="badge fs-6
+                            {% if g.grade >= g.max_grade * 0.7 %}bg-success
+                            {% elif g.grade >= g.max_grade * 0.5 %}bg-warning text-dark
+                            {% else %}bg-danger{% endif %}">
+                            {{ g.grade }}/{{ g.max_grade }}
+                        </span>
+                        {% else %}
+                        <span class="badge bg-secondary">Αναμένει βαθμολόγηση</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ g.feedback or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card-body text-muted text-center py-4">
+        <i class="bi bi-clipboard fs-3"></i>
+        <p>Δεν υπάρχουν βαθμολογίες εργασιών ακόμα.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Βαθμοί Τεστ -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+            <span class="card-header-icon"><i class="bi bi-pencil-square"></i></span>
+            Τεστ Αξιολόγησης
+        </h5>
+    </div>
+    {% if test_grades %}
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Τεστ</th>
+                    <th>Ημ/νία</th>
+                    <th>Βαθμός</th>
+                    <th>Ποσοστό</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for g in test_grades %}
+                <tr>
+                    <td class="fw-semibold">{{ g.title }}</td>
+                    <td>{{ g.completed_at[:10] if g.completed_at else '-' }}</td>
+                    <td>
+                        <span class="badge fs-6
+                            {% set pct = (g.score / g.max_score * 100) if g.max_score else 0 %}
+                            {% if pct >= 70 %}bg-success
+                            {% elif pct >= 50 %}bg-warning text-dark
+                            {% else %}bg-danger{% endif %}">
+                            {{ g.score }}/{{ g.max_score }}
+                        </span>
+                    </td>
+                    <td>
+                        {% set pct = (g.score / g.max_score * 100)|round(1) if g.max_score else 0 %}
+                        <div class="progress" style="height: 20px; min-width: 100px;">
+                            <div class="progress-bar 
+                                {% if pct >= 70 %}bg-success{% elif pct >= 50 %}bg-warning{% else %}bg-danger{% endif %}"
+                                style="width: {{ pct }}%">
+                                {{ pct }}%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="card-body text-muted text-center py-4">
+        <i class="bi bi-pencil-square fs-3"></i>
+        <p>Δεν υπάρχουν βαθμολογίες τεστ ακόμα.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

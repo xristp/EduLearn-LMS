@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Εργασίες - {{ course.name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item active">{{ course.name }}</li>
+        <li class="breadcrumb-item active">Εργασίες</li>
+    </ol>
+</nav>
+
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-title">Εργασίες</h1>
+            <p class="page-subtitle">{{ course.name }}</p>
+        </div>
+        {% if current_user.role == 'instructor' %}
+        <a href="{{ url_for('create_assignment', course_id=course.id) }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i>Νέα
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if assignments %}
+{% for assignment in assignments %}
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">
+            <i class="bi bi-clipboard me-2 text-primary"></i>{{ assignment.title }}
+        </h5>
+        {% if assignment.due_date %}
+        <span class="badge bg-warning text-dark px-3 py-2">
+            <i class="bi bi-calendar me-1"></i>Προθεσμία: {{ assignment.due_date }}
+        </span>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            {{ assignment.description|replace('\n', '<br>')|safe }}
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-light text-dark">
+                <i class="bi bi-star me-1"></i>Μέγιστος βαθμός: {{ assignment.max_grade }}
+            </span>
+        </div>
+
+        {% if current_user.role == 'student' %}
+        <!-- Φοιτητής: Κατάσταση υποβολής -->
+        <hr>
+        {% if assignment.id in submissions %}
+            {% set sub = submissions[assignment.id] %}
+            <div class="alert alert-success mb-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Υποβλήθηκε</strong> στις {{ sub.submitted_at[:16] }}
+                        {% if sub.grade is not none %}
+                        <span class="ms-3 badge bg-primary fs-6">Βαθμός: {{ sub.grade }}/{{ assignment.max_grade }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if sub.feedback %}
+                <div class="mt-2">
+                    <strong>Σχόλια εκπαιδευτή:</strong> {{ sub.feedback }}
+                </div>
+                {% endif %}
+            </div>
+        {% else %}
+            <a href="{{ url_for('submit_assignment', assignment_id=assignment.id) }}" class="btn btn-success">
+                <i class="bi bi-upload me-1"></i>Υποβολή Εργασίας
+            </a>
+        {% endif %}
+        {% endif %}
+
+        {% if current_user.role == 'instructor' %}
+        <!-- Εκπαιδευτής: Υποβολές φοιτητών -->
+        <hr>
+        <h6 class="fw-semibold"><i class="bi bi-people me-2"></i>Υποβολές Φοιτητών</h6>
+        {% if all_submissions.get(assignment.id) %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Φοιτητής</th>
+                        <th>Ημ/νία Υποβολής</th>
+                        <th>Αρχείο</th>
+                        <th>Βαθμός</th>
+                        <th>Ενέργειες</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in all_submissions[assignment.id] %}
+                    <tr>
+                        <td>{{ sub.student_name }}</td>
+                        <td>{{ sub.submitted_at[:16] }}</td>
+                        <td>
+                            {% if sub.file_path %}
+                            <a href="{{ url_for('download_file', filename=sub.file_path) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if sub.grade is not none %}
+                            <span class="badge bg-success">{{ sub.grade }}/{{ assignment.max_grade }}</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Αναμένει</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('grade_submission', submission_id=sub.id) }}" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-pencil me-1"></i>Βαθμολόγηση
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">Δεν υπάρχουν υποβολές ακόμα.</p>
+        {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="text-center py-5 text-muted">
+    <i class="bi bi-clipboard fs-1"></i>
+    <p class="mt-2">Δεν υπάρχουν εργασίες ακόμα.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,985 @@
+/* ========== Layout: left sidebar + main ========== */
+:root {
+    --sidebar-width: 240px;
+    --sidebar-width-collapsed: 56px;
+    --sidebar-bg: #1a1d23;
+    --sidebar-text: rgba(255,255,255,0.85);
+    --sidebar-active: #8B2332;
+    --sidebar-hover: rgba(255,255,255,0.08);
+    /* Brand: icon boxes + buttons use white bg, red icon/text, red outline */
+    --brand-icon: #8B2332;
+    --brand-icon-bg: #fff;
+    --brand-icon-border: #8B2332;
+    --bs-primary: #8B2332;
+}
+
+body.app-with-sidebar {
+    display: flex;
+    min-height: 100vh;
+    background: #f5f6f8;
+}
+
+.app-sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1030;
+    transition: width 0.25s ease, min-width 0.25s ease;
+}
+.app-sidebar.sidebar-collapsed {
+    width: var(--sidebar-width-collapsed);
+    min-width: var(--sidebar-width-collapsed);
+}
+.app-sidebar.sidebar-collapsed .sidebar-dropdown-label,
+.app-sidebar.sidebar-collapsed .sidebar-link span,
+.app-sidebar.sidebar-collapsed .sidebar-section-label,
+.app-sidebar.sidebar-collapsed .sidebar-user-name,
+.app-sidebar.sidebar-collapsed .sidebar-user-role,
+.app-sidebar.sidebar-collapsed .sidebar-semester-wrap,
+.app-sidebar.sidebar-collapsed .sidebar-section-toggle .sidebar-section-label,
+.app-sidebar.sidebar-collapsed .sidebar-dropdown-arrow { display: none !important; }
+.app-sidebar.sidebar-collapsed .sidebar-section-collapsible { display: none !important; }
+.app-sidebar.sidebar-collapsed .sidebar-lessons-wrap,
+.app-sidebar.sidebar-collapsed .sidebar-utils-wrap { display: none !important; }
+.app-sidebar.sidebar-collapsed .sidebar-toggle-btn i { transform: rotate(180deg); }
+.app-sidebar.sidebar-collapsed .sidebar-brand { justify-content: center; }
+.app-main { transition: margin-left 0.25s ease; }
+.app-sidebar.sidebar-collapsed ~ .app-main { margin-left: var(--sidebar-width-collapsed); }
+
+.sidebar-header {
+    padding: 0.75rem 0.75rem 1rem 1.25rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-toggle-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.7);
+    padding: 0.35rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background 0.15s;
+}
+.sidebar-toggle-btn:hover { color: #fff; background: var(--sidebar-hover); }
+.sidebar-toggle-btn i { transition: transform 0.2s ease; font-size: 1rem; }
+
+.sidebar-semester-wrap {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-nav .sidebar-semester-wrap {
+    margin-top: 0.35rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--sidebar-hover);
+    border: none;
+    border-radius: 8px;
+    color: var(--sidebar-text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+.sidebar-dropdown-toggle:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.sidebar-dropdown-arrow { font-size: 0.75rem; transition: transform 0.2s ease; }
+.sidebar-dropdown-toggle[aria-expanded="true"] .sidebar-dropdown-arrow { transform: rotate(180deg); }
+.sidebar-dropdown-inner { padding: 0.25rem 0 0 0.5rem; }
+.sidebar-dropdown-item {
+    display: block;
+    padding: 0.35rem 0.75rem;
+    color: var(--sidebar-text);
+    font-size: 0.8rem;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-bottom: 2px;
+}
+.sidebar-dropdown-item:hover { background: var(--sidebar-hover); color: #fff; }
+.sidebar-dropdown-item.active { background: rgba(139, 35, 50, 0.35); color: #fff; }
+
+.sidebar-section-collapsible { margin-top: 0.25rem; }
+.sidebar-section-toggle {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.75rem 1rem 0.35rem;
+    cursor: pointer;
+    text-align: left;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-section-toggle:hover { color: var(--sidebar-text); }
+.sidebar-section-arrow { font-size: 0.65rem; transition: transform 0.2s ease; }
+.sidebar-section-toggle[aria-expanded="true"] .sidebar-section-arrow { transform: rotate(180deg); }
+.sidebar-section-toggle[aria-expanded="false"] .sidebar-section-arrow { transform: rotate(0); }
+.sidebar-section-collapsible .sidebar-section-label { border: none; margin: 0; padding: 0; }
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* Full horizontal logo (emblem + "Πανεπιστήμιο Πειραιώς / University of Piraeus") */
+.sidebar-brand--full {
+    padding: 0.25rem 0;
+}
+.sidebar-brand-full-logo {
+    height: 56px;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: left center;
+    display: block;
+}
+.sidebar-brand-collapsed-logo,
+.sidebar-logo-collapsed { display: none !important; }
+.app-sidebar.sidebar-collapsed .sidebar-brand-full-logo { height: 48px; }
+
+.sidebar-brand-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--sidebar-active);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    overflow: hidden;
+}
+.sidebar-brand-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 1rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+.sidebar-section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.5);
+    padding: 0.75rem 1rem 0.35rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-nav .sidebar-section-label:first-of-type {
+    margin-top: 0.25rem;
+    border-top: none;
+    padding-top: 0.5rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-link:hover {
+    background: var(--sidebar-hover);
+    color: #fff;
+}
+
+.sidebar-link.active {
+    background: rgba(139, 35, 50, 0.35);
+    color: #fff;
+}
+
+.sidebar-link i {
+    font-size: 1.15rem;
+    opacity: 0.9;
+}
+
+.sidebar-link-sub {
+    padding-left: 1.5rem;
+    font-size: 0.875rem;
+}
+
+.sidebar-link-sub i {
+    font-size: 1rem;
+}
+
+/* Compact lessons list (clickable, scrollable – more fit) */
+.sidebar-lessons-wrap {
+    margin-top: 0.35rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-lessons-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.5);
+    padding: 0 0.75rem 0.35rem;
+}
+.sidebar-lessons-semester-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.12);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.sidebar-lessons-empty {
+    padding: 0.75rem;
+    text-align: center;
+}
+.sidebar-lessons-empty-text {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.6);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.35;
+}
+.sidebar-lessons-empty-link {
+    font-size: 0.75rem;
+    color: #8B2332;
+    background: rgba(139, 35, 50, 0.2);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.15s, color 0.15s;
+}
+.sidebar-lessons-empty-link:hover {
+    background: rgba(139, 35, 50, 0.35);
+    color: #fff;
+}
+.sidebar-lessons-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0 0.25rem;
+}
+.sidebar-lesson-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+}
+.sidebar-lesson-link:hover {
+    background: var(--sidebar-hover);
+    color: #fff;
+}
+.sidebar-lesson-link.active {
+    background: rgba(139, 35, 50, 0.35);
+    color: #fff;
+}
+.sidebar-lesson-link i {
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    opacity: 0.9;
+}
+.sidebar-lesson-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Compact utils (Υλικό, Ανακοινώσεις, …) for current lesson */
+.sidebar-utils-wrap {
+    margin-top: 0.25rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-utils-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.5);
+    padding: 0 0.75rem 0.25rem;
+}
+.sidebar-utils-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.sidebar-utils-list .sidebar-link-sub {
+    padding: 0.35rem 0.75rem 0.35rem 1.25rem;
+    font-size: 0.8rem;
+}
+.sidebar-utils-list .sidebar-link-sub i {
+    font-size: 0.9rem;
+}
+
+.sidebar-footer {
+    padding: 1rem 0.75rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-user {
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.sidebar-user-name {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.sidebar-user-role {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.sidebar-link-logout {
+    color: rgba(255,255,255,0.6);
+}
+
+.sidebar-link-logout:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.app-main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.app-main--dashboard-banner {
+    position: relative;
+}
+.app-main--dashboard-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('../images/unipi-banner.png') center top / cover no-repeat;
+    background-attachment: scroll;
+    opacity: 0.7;
+    z-index: 0;
+}
+.app-main--dashboard-banner > * { position: relative; z-index: 1; }
+@media (min-width: 992px) {
+    .app-main--dashboard-banner::before { background-attachment: fixed; }
+}
+
+.app-main-inner {
+    flex: 1;
+    padding: 1.5rem 2rem;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.flash-messages {
+    margin-bottom: 1rem;
+}
+
+/* Auth pages (login/register): banner background + centered layout */
+body.page-auth-banner {
+    min-height: 100vh;
+    position: relative;
+}
+body.page-auth-banner::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url('../images/unipi-banner.png') center center / cover no-repeat;
+    opacity: 0.7;
+    z-index: 0;
+}
+body.page-auth-banner .app-main {
+    margin-left: 0;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 0;
+}
+body.page-auth-banner #app-content-wrap {
+    width: 100%;
+}
+body.page-auth-banner .card {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(229, 231, 235, 0.8);
+}
+.login-logo {
+    object-fit: contain;
+}
+
+/* ========== Page header & content ========== */
+.page-header {
+    margin-bottom: 1.5rem;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #1a1d23;
+}
+
+.page-subtitle {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+.role-badge {
+    background: rgba(139, 35, 50, 0.12);
+    color: #8B2332;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: #1a1d23;
+}
+
+.section-action {
+    font-size: 0.85rem;
+    color: #8B2332;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.section-action:hover {
+    color: #6b1c28;
+}
+
+/* Shared placeholder/card style for dashboard sections (thin brand red outline) */
+.dashboard-semester-wrap,
+.dashboard-main-wrap {
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(139, 35, 50, 0.35);
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.dashboard-semester-wrap { padding: 0.75rem 1rem; }
+.dashboard-main-wrap { padding: 1.25rem 1.5rem; }
+
+.dashboard-semester-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    padding: 0;
+}
+.dashboard-semester-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    margin: 0;
+}
+.dashboard-semester-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+}
+.dashboard-semester-link {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 8px;
+    background: #f3f4f6;
+    color: #4b5563;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+.dashboard-semester-link:hover { background: #e5e7eb; color: #1a1d23; }
+.dashboard-semester-link.active {
+    background: rgba(139, 35, 50, 0.12);
+    color: #8B2332;
+    font-weight: 600;
+}
+
+/* AJAX content loading state */
+#app-content.app-content-loading {
+    opacity: 0.7;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+/* ========== Metric cards ========== */
+.metric-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(139, 35, 50, 0.35);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.metric-card:hover {
+    border-color: rgba(139, 35, 50, 0.5);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.metric-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+    background: var(--brand-icon-bg) !important;
+    color: var(--brand-icon) !important;
+    border: 2px solid var(--brand-icon-border);
+}
+
+/* Card header icon: branded look (white bg, red icon, red outline) */
+.card-header-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background: var(--brand-icon-bg) !important;
+    color: var(--brand-icon) !important;
+    border: 2px solid var(--brand-icon-border);
+}
+.card-header-icon i { font-size: 1.1rem; }
+
+/* Generic branded icon box (use on any page for consistency) */
+.icon-box-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 8px;
+    flex-shrink: 0;
+    background: var(--brand-icon-bg) !important;
+    color: var(--brand-icon) !important;
+    border: 2px solid var(--brand-icon-border);
+}
+.icon-box-brand i { font-size: 1.15rem; }
+
+/* ========== Brand buttons (red bg, white text) ========== */
+.btn-primary {
+    background-color: var(--brand-icon) !important;
+    color: #fff !important;
+    border: 2px solid var(--brand-icon-border);
+}
+.btn-primary:hover {
+    background-color: #6b1c28 !important;
+    color: #fff !important;
+    border-color: #6b1c28;
+}
+.btn-outline-primary {
+    background-color: transparent;
+    color: var(--brand-icon);
+    border: 2px solid var(--brand-icon-border);
+}
+.btn-outline-primary:hover {
+    background-color: var(--brand-icon);
+    color: #fff !important;
+    border-color: var(--brand-icon);
+}
+
+/* Primary utilities (badges, labels): use brand red */
+.text-primary { color: var(--brand-icon) !important; }
+.bg-primary { background-color: var(--brand-icon) !important; }
+.bg-primary.bg-opacity-10 { background-color: rgba(139, 35, 50, 0.1) !important; }
+
+.metric-body {
+    min-width: 0;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1a1d23;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.15rem;
+}
+
+/* ========== Course card compact (instructor dashboard) ========== */
+.course-card-compact .course-card-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+.course-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: #4b5563;
+    background: #f3f4f6;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+}
+.course-stat-pill i {
+    font-size: 0.75rem;
+    opacity: 0.85;
+}
+.course-stat-pill-warn {
+    background: #fefce8;
+    color: #ca8a04;
+}
+.course-avg-badge {
+    background: rgba(139, 35, 50, 0.08);
+    color: #8B2332;
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    min-width: 48px;
+}
+.course-avg-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.course-avg-label {
+    font-size: 0.6rem;
+    opacity: 0.9;
+}
+.course-card-link {
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+.course-card-link:hover .card {
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.12) !important;
+}
+.course-card-link:hover {
+    opacity: 0.95;
+}
+.dashboard-main-wrap .card.course-card-compact {
+    border: 1px solid rgba(139, 35, 50, 0.35) !important;
+}
+
+/* ========== Dashboard calendar ========== */
+.dashboard-calendar-card {
+    border: 1px solid rgba(139, 35, 50, 0.35);
+}
+.dashboard-calendar-header {
+    margin-bottom: 0.5rem;
+}
+.dashboard-calendar-month {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1a1d23;
+}
+.dashboard-calendar-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+.dashboard-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-align: center;
+}
+.dashboard-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+.dashboard-calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #374151;
+    background: #f9fafb;
+    border-radius: 6px;
+    position: relative;
+    overflow: visible;
+}
+.dashboard-calendar-day-num {
+    line-height: 1;
+}
+.dashboard-calendar-day-empty {
+    background: transparent;
+}
+.dashboard-calendar-day-busy {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #8B2332;
+    font-weight: 600;
+    border: 1px solid rgba(139, 35, 50, 0.25);
+    box-shadow: 0 0 0 1px rgba(139, 35, 50, 0.08);
+}
+.dashboard-calendar-busy-indicator {
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    min-width: 14px;
+    height: 14px;
+    padding: 0 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: #fff;
+    background: #8B2332;
+    border-radius: 10px;
+    line-height: 1;
+}
+.dashboard-calendar-dots {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    pointer-events: none;
+}
+.dashboard-calendar-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.08);
+}
+.dashboard-calendar-dot-event {
+    background: #8B2332;
+}
+.dashboard-calendar-dot-assignment {
+    background: #ca8a04;
+}
+.dashboard-calendar-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+.dashboard-calendar-item {
+    border-bottom: 1px solid #f3f4f6;
+}
+.dashboard-calendar-item:last-child {
+    border-bottom: 0;
+}
+.dashboard-calendar-item-type {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+.dashboard-calendar-type-event {
+    background: rgba(139, 35, 50, 0.12);
+    color: #8B2332;
+}
+.dashboard-calendar-type-assignment {
+    background: #fefce8;
+    color: #ca8a04;
+}
+
+/* ========== Dashboard overview chart (bar graph) ========== */
+.dashboard-overview-chart {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.dashboard-overview-chart .chart-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    min-height: 140px;
+    padding: 0.5rem 0;
+}
+
+.chart-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-bar {
+    width: 100%;
+    max-width: 64px;
+    min-height: 24px;
+    border-radius: 8px 8px 0 0;
+    transition: height 0.4s ease;
+}
+
+.chart-bar-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.chart-bar-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1d23;
+}
+
+/* ========== Mini stats (course cards) ========== */
+.mini-stat {
+    text-align: center;
+    padding: 0.4rem 0.25rem;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.mini-stat-value {
+    display: block;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1a1d23;
+}
+
+.mini-stat-label {
+    font-size: 0.65rem;
+    color: #6b7280;
+}
+
+.mini-stat-warning .mini-stat-value {
+    color: #ca8a04;
+}
+
+/* ========== Quick links ========== */
+.quick-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.8rem;
+    color: #4b5563;
+    background: #f3f4f6;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+
+.quick-link:hover {
+    background: #e5e7eb;
+    color: #1a1d23;
+}
+
+.quick-link-accent {
+    background: rgba(139, 35, 50, 0.1);
+    color: #8B2332;
+}
+
+.quick-link-accent:hover {
+    background: rgba(139, 35, 50, 0.18);
+    color: #6b1c28;
+}
+
+/* ========== Sidebar content items (dashboard right column) ========== */
+.sidebar-item:hover {
+    background: #f9fafb;
+}
+
+/* ========== Responsive: collapse sidebar on small screens ========== */
+@media (max-width: 991.98px) {
+    .app-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+    }
+    body.sidebar-open .app-sidebar {
+        transform: translateX(0);
+    }
+    .app-main {
+        margin-left: 0;
+    }
+    .app-main-inner {
+        padding: 1rem;
+    }
+}
+
+/* Navbar shadow on scroll (when/if top navbar is used) */
+.navbar.scrolled {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}

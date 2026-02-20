@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Συζητήσεις - {{ course.name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item active">{{ course.name }}</li>
+        <li class="breadcrumb-item active">Συζητήσεις</li>
+    </ol>
+</nav>
+
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-title">Forum Συζητήσεων</h1>
+            <p class="page-subtitle">{{ course.name }}</p>
+        </div>
+        <a href="{{ url_for('create_discussion', course_id=course.id) }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i>Νέα
+        </a>
+    </div>
+</div>
+
+{% if discussions %}
+<div class="list-group">
+    {% for disc in discussions %}
+    <a href="{{ url_for('discussion_thread', discussion_id=disc.id) }}" class="list-group-item list-group-item-action border-0 shadow-sm mb-2 rounded">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="mb-1 fw-bold">
+                    <i class="bi bi-chat-left-text text-primary me-2"></i>{{ disc.title }}
+                </h6>
+                <small class="text-muted">
+                    <i class="bi bi-person me-1"></i>{{ disc.author_name }}
+                    <span class="mx-2">|</span>
+                    <i class="bi bi-calendar me-1"></i>{{ disc.created_at[:10] }}
+                </small>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-primary rounded-pill">
+                    <i class="bi bi-chat-dots me-1"></i>{{ disc.post_count }} απαντήσεις
+                </span>
+                {% if disc.last_post %}
+                <br><small class="text-muted">Τελευταία: {{ disc.last_post[:10] }}</small>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+    <i class="bi bi-chat-dots fs-1"></i>
+    <p class="mt-2">Δεν υπάρχουν συζητήσεις ακόμα. Δημιουργήστε μία!</p>
+</div>
+{% endif %}
+{% endblock %}

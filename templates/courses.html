@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Μαθήματα{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-title">Διαθέσιμα Μαθήματα</h1>
+            <p class="page-subtitle">Εγγραφή σε νέα μαθήματα ή διαχείριση υπαρχόντων.</p>
+        </div>
+        {% if current_user.role == 'instructor' %}
+        <a href="{{ url_for('create_course') }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i>Νέο
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if courses %}
+<div class="row g-4">
+    {% for course in courses %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="fw-bold">
+                    <i class="bi bi-journal-bookmark text-primary me-2"></i>{{ course.name }}
+                </h5>
+                <p class="text-muted small">{{ course.description[:150] if course.description else '' }}{% if course.description and course.description|length > 150 %}...{% endif %}</p>
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-person-workspace me-1"></i>{{ course.instructor_name }}
+                    </span>
+                    <span class="badge bg-light text-dark">
+                        <i class="bi bi-people me-1"></i>{{ course.student_count }} φοιτητές
+                    </span>
+                </div>
+
+                {% if current_user.role == 'student' %}
+                    {% if course.id in enrolled_ids %}
+                    <span class="badge bg-success px-3 py-2">
+                        <i class="bi bi-check-circle me-1"></i>Εγγεγραμμένος
+                    </span>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('enroll', course_id=course.id) }}" class="d-inline">
+                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-box-arrow-in-right me-1"></i>Εγγραφή
+                        </button>
+                    </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+    <i class="bi bi-book fs-1"></i>
+    <p class="mt-2">Δεν υπάρχουν διαθέσιμα μαθήματα.</p>
+</div>
+{% endif %}
+{% endblock %}

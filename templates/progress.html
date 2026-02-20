@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Πρόοδος Φοιτητών - {{ course.name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item active">{{ course.name }}</li>
+        <li class="breadcrumb-item active">Πρόοδος Φοιτητών</li>
+    </ol>
+</nav>
+
+<div class="page-header mb-4">
+    <h1 class="page-title">Παρακολούθηση Προόδου</h1>
+    <p class="page-subtitle">{{ course.name }} — Συνολική επισκόπηση προόδου εγγεγραμμένων φοιτητών.</p>
+</div>
+
+{% if student_progress %}
+<div class="table-responsive">
+    <table class="table table-hover shadow-sm bg-white rounded">
+        <thead>
+            <tr>
+                <th>Φοιτητής</th>
+                <th class="text-center">Εργασίες</th>
+                <th class="text-center">Μ.Ο. Εργασιών</th>
+                <th class="text-center">Τεστ</th>
+                <th class="text-center">Μ.Ο. Τεστ</th>
+                <th class="text-center">Δημοσιεύσεις Forum</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sp in student_progress %}
+            <tr>
+                <td>
+                    <div>
+                        <strong>{{ sp.student.full_name }}</strong><br>
+                        <small class="text-muted">{{ sp.student.email or '' }}</small>
+                    </div>
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-info">{{ sp.submitted_assignments }}/{{ sp.total_assignments }}</span>
+                    <div class="progress mt-1" style="height: 5px;">
+                        {% set pct = (sp.submitted_assignments / sp.total_assignments * 100) if sp.total_assignments > 0 else 0 %}
+                        <div class="progress-bar bg-info" style="width: {{ pct }}%"></div>
+                    </div>
+                </td>
+                <td class="text-center">
+                    {% if sp.avg_assignment_grade is not none %}
+                    <span class="badge fs-6
+                        {% if sp.avg_assignment_grade >= 70 %}bg-success
+                        {% elif sp.avg_assignment_grade >= 50 %}bg-warning text-dark
+                        {% else %}bg-danger{% endif %}">
+                        {{ sp.avg_assignment_grade }}
+                    </span>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-info">{{ sp.completed_tests }}/{{ sp.total_tests }}</span>
+                    <div class="progress mt-1" style="height: 5px;">
+                        {% set pct = (sp.completed_tests / sp.total_tests * 100) if sp.total_tests > 0 else 0 %}
+                        <div class="progress-bar bg-info" style="width: {{ pct }}%"></div>
+                    </div>
+                </td>
+                <td class="text-center">
+                    {% if sp.avg_test_score is not none %}
+                    <span class="badge fs-6
+                        {% if sp.avg_test_score >= 70 %}bg-success
+                        {% elif sp.avg_test_score >= 50 %}bg-warning text-dark
+                        {% else %}bg-danger{% endif %}">
+                        {{ sp.avg_test_score }}%
+                    </span>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-secondary">{{ sp.discussion_posts }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+    <i class="bi bi-people fs-1"></i>
+    <p class="mt-2">Δεν υπάρχουν εγγεγραμμένοι φοιτητές ακόμα.</p>
+</div>
+{% endif %}
+{% endblock %}

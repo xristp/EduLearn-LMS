@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Νέο Μάθημα{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('all_courses') }}">Μαθήματα</a></li>
+        <li class="breadcrumb-item active">Νέο Μάθημα</li>
+    </ol>
+</nav>
+
+<div class="page-header mb-4">
+    <h1 class="page-title">Δημιουργία Μαθήματος</h1>
+    <p class="page-subtitle">Συμπληρώστε τα παρακάτω στοιχεία για να δημιουργήσετε ένα νέο μάθημα.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+                    <span class="card-header-icon"><i class="bi bi-book"></i></span>
+                    Στοιχεία Μαθήματος
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label fw-semibold">Όνομα Μαθήματος *</label>
+                        <input type="text" class="form-control" id="name" name="name"
+                               placeholder="π.χ. Δομές Δεδομένων" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-semibold">Περιγραφή</label>
+                        <textarea class="form-control" id="description" name="description" rows="4"
+                                  placeholder="Σύντομη περιγραφή του μαθήματος..."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="semester" class="form-label fw-semibold">Εξάμηνο</label>
+                        <input type="text" class="form-control" id="semester" name="semester"
+                               placeholder="π.χ. Εαρινό 2025-2026 ή Χειμερινό 2025-2026">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Δημιουργία
+                        </button>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Ακύρωση</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

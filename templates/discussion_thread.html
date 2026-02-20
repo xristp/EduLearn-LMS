@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}{{ discussion.title }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('discussions', course_id=discussion.course_id) }}">Συζητήσεις</a></li>
+        <li class="breadcrumb-item active">{{ discussion.title }}</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-9">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header">
+                <h5 class="mb-1 fw-semibold d-flex align-items-center gap-2">
+                    <span class="card-header-icon"><i class="bi bi-chat-left-text"></i></span>
+                    {{ discussion.title }}
+                </h5>
+                <div class="thread-meta ms-5">
+                    <span><i class="bi bi-person"></i>{{ discussion.author_name }}</span>
+                    <span><i class="bi bi-calendar3"></i>{{ discussion.created_at[:16] }}</span>
+                    <span><i class="bi bi-book"></i>{{ discussion.course_name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Δημοσιεύσεις -->
+        {% for post in posts %}
+        <div class="card border-0 shadow-sm mb-3 
+            {% if post.author_role == 'instructor' %}border-start border-primary border-3{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <strong class="me-2">
+                            <i class="bi bi-person-circle me-1"></i>{{ post.author_name }}
+                        </strong>
+                        {% if post.author_role == 'instructor' %}
+                        <span class="badge bg-primary">Εκπαιδευτής</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Φοιτητής</span>
+                        {% endif %}
+                    </div>
+                    <small class="text-muted">
+                        <i class="bi bi-clock me-1"></i>{{ post.created_at[:16] }}
+                    </small>
+                </div>
+                <hr>
+                <div class="post-content">
+                    {{ post.content|replace('\n', '<br>')|safe }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Φόρμα Νέας Απάντησης -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"><i class="bi bi-reply me-2"></i>Γράψτε Απάντηση</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <textarea class="form-control" name="content" rows="4"
+                                  placeholder="Γράψτε την απάντησή σας..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-1"></i>Δημοσίευση
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

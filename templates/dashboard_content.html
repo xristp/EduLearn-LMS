@@ -1,0 +1,279 @@
+{# Dashboard body only (used for full page and for partial AJAX load) #}
+<div class="dashboard-partial" data-current-semester="{{ current_semester_filter or '' }}" data-page="dashboard">
+<!-- Semester filter: overview per semester -->
+{% if sidebar_semesters|length > 0 or current_semester_filter %}
+<div class="dashboard-semester-wrap mb-4">
+    <div class="dashboard-semester-bar">
+        <span class="dashboard-semester-label"><i class="bi bi-calendar3 me-1"></i>Επισκόπηση εξαμήνου</span>
+        <div class="dashboard-semester-links" data-nav="semester">
+            <a href="{{ url_for('set_semester') }}" class="dashboard-semester-link {% if not current_semester_filter %}active{% endif %}" data-semester="">Όλα</a>
+            {% for sem in sidebar_semesters %}
+            <a href="{{ url_for('set_semester', semester=sem) }}" class="dashboard-semester-link {% if current_semester_filter == sem %}active{% endif %}" data-semester="{{ sem }}">{{ sem }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- Main dashboard area (same placeholder style as Επισκόπηση) -->
+<div class="dashboard-main-wrap mb-4">
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+            <h1 class="page-title">Καλημέρα, {{ current_user.full_name.split(' ')[0] }}</h1>
+            <p class="page-subtitle">Ακολουθεί μια σύνοψη της πλατφόρμας σας.</p>
+        </div>
+        <span class="badge rounded-pill role-badge">
+            {% if current_user.role == 'instructor' %}Εκπαιδευτής{% else %}Φοιτητής{% endif %}
+        </span>
+    </div>
+</div>
+
+{% if current_user.role == 'instructor' %}
+{# INSTRUCTOR DASHBOARD #}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="bi bi-book"></i></div>
+            <div class="metric-body">
+                <div class="metric-value">{{ overview.total_courses }}</div>
+                <div class="metric-label">Μαθήματα</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="bi bi-people"></i></div>
+            <div class="metric-body">
+                <div class="metric-value">{{ overview.total_students }}</div>
+                <div class="metric-label">Φοιτητές</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="metric-body">
+                <div class="metric-value">{{ overview.total_pending }}</div>
+                <div class="metric-label">Αναμένουν Βαθμολόγηση</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="bi bi-file-earmark-check"></i></div>
+            <div class="metric-body">
+                <div class="metric-value">{{ overview.total_submissions }}</div>
+                <div class="metric-label">Συνολικές Υποβολές</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="section-header mb-3"><h2 class="section-title">Τα Μαθήματά μου</h2></div>
+        {% for course in courses %}
+        <a href="{{ url_for('materials', course_id=course.id) }}" class="text-decoration-none text-dark d-block mb-3 course-card-link" data-prefetch>
+        <div class="card border-0 shadow-sm course-card-compact h-100">
+            <div class="card-body p-3">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                    <div class="flex-grow-1 min-width-0">
+                        <h5 class="fw-bold mb-1">{{ course.name }}</h5>
+                        <p class="text-muted small mb-2">{{ course.description[:100] }}{% if course.description|length > 100 %}...{% endif %}</p>
+                        <div class="course-card-stats">
+                            <span class="course-stat-pill"><i class="bi bi-people"></i> {{ stats[course.id].students }}</span>
+                            <span class="course-stat-pill"><i class="bi bi-file-earmark"></i> {{ stats[course.id].materials }}</span>
+                            <span class="course-stat-pill"><i class="bi bi-clipboard"></i> {{ stats[course.id].assignments }}</span>
+                            <span class="course-stat-pill"><i class="bi bi-pencil-square"></i> {{ stats[course.id].tests }}</span>
+                            <span class="course-stat-pill"><i class="bi bi-chat-dots"></i> {{ stats[course.id].discussions }}</span>
+                            <span class="course-stat-pill {% if stats[course.id].pending > 0 %}course-stat-pill-warn{% endif %}"><i class="bi bi-hourglass-split"></i> {{ stats[course.id].pending }} εκκρ.</span>
+                        </div>
+                    </div>
+                    {% if stats[course.id].avg_grade is not none %}
+                    <div class="course-avg-badge text-center flex-shrink-0">
+                        <span class="course-avg-value">{{ stats[course.id].avg_grade }}</span>
+                        <span class="course-avg-label">Μ.Ο.</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        </a>
+        {% endfor %}
+        {% if announcements %}
+        <div class="section-header mt-4 mb-3">
+            <h2 class="section-title">Πρόσφατες Ανακοινώσεις</h2>
+            {% if current_semester_filter %}<span class="text-muted small fw-normal">({{ current_semester_filter }})</span>{% endif %}
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="list-group list-group-flush">
+                {% for ann in announcements %}
+                <div class="list-group-item px-lg-4 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-semibold">{{ ann.title }}</h6>
+                            <p class="mb-0 text-muted small">{{ ann.content[:140] }}{% if ann.content|length > 140 %}...{% endif %}</p>
+                        </div>
+                        <div class="text-end flex-shrink-0 ms-3">
+                            <span class="badge bg-light text-muted fw-normal">{{ ann.course_name }}</span>
+                            <div class="text-muted" style="font-size:.7rem;">{{ ann.created_at[:10] }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-lg-4">{% include 'dashboard_calendar.html' %}</div>
+</div>
+
+{% else %}
+{# STUDENT DASHBOARD #}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="bi bi-book"></i></div>
+            <div class="metric-body"><div class="metric-value">{{ student_stats.enrolled_courses }}</div><div class="metric-label">Μαθήματα</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="metric-body"><div class="metric-value">{{ student_stats.pending_count }}</div><div class="metric-label">Εκκρεμείς Εργασίες</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="bi bi-check-circle"></i></div>
+            <div class="metric-body"><div class="metric-value">{{ student_stats.submitted_count }}</div><div class="metric-label">Υποβολές</div></div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <div class="metric-body"><div class="metric-value">{{ student_stats.avg_grade if student_stats.avg_grade is not none else '—' }}{% if student_stats.avg_grade is not none %}%{% endif %}</div><div class="metric-label">Μ.Ο. Εργασιών</div></div>
+        </div>
+    </div>
+</div>
+
+{% if student_stats.avg_grade is not none or student_stats.avg_test is not none %}
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <h6 class="fw-semibold mb-3 small text-muted text-uppercase" style="letter-spacing:.04em;">Επίδοση</h6>
+        <div class="row g-4">
+            {% if student_stats.avg_grade is not none %}
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between mb-1"><span class="small fw-medium">Εργασίες</span><span class="small text-muted">{{ student_stats.avg_grade }}%</span></div>
+                <div class="progress" style="height:8px;"><div class="progress-bar" style="width:{{ student_stats.avg_grade }}%;background:{% if student_stats.avg_grade >= 80 %}#059669{% elif student_stats.avg_grade >= 50 %}#ca8a04{% else %}#dc2626{% endif %};"></div></div>
+            </div>
+            {% endif %}
+            {% if student_stats.avg_test is not none %}
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between mb-1"><span class="small fw-medium">Τεστ ({{ student_stats.test_attempts }} προσπάθειες)</span><span class="small text-muted">{{ student_stats.avg_test }}%</span></div>
+                <div class="progress" style="height:8px;"><div class="progress-bar" style="width:{{ student_stats.avg_test }}%;background:{% if student_stats.avg_test >= 80 %}#059669{% elif student_stats.avg_test >= 50 %}#ca8a04{% else %}#dc2626{% endif %};"></div></div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="section-header mb-3">
+            <h2 class="section-title">Τα Μαθήματά μου</h2>
+            <a href="{{ url_for('all_courses') }}" class="section-action">Όλα τα Μαθήματα <i class="bi bi-arrow-right"></i></a>
+        </div>
+        {% if courses %}
+        {% for course in courses %}
+        <a href="{{ url_for('materials', course_id=course.id) }}" class="text-decoration-none text-dark d-block mb-3 course-card-link" data-prefetch>
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="fw-bold mb-2">{{ course.name }}</h6>
+                <p class="text-muted small mb-0">{{ course.description[:100] }}{% if course.description|length > 100 %}...{% endif %}</p>
+            </div>
+        </div>
+        </a>
+        {% endfor %}
+        {% else %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-journal-x text-muted" style="font-size:2.5rem;"></i>
+                <p class="text-muted mt-3 mb-3">Δεν είστε εγγεγραμμένος σε κάποιο μάθημα</p>
+                <a href="{{ url_for('all_courses') }}" class="btn btn-primary btn-sm">Αναζήτηση Μαθημάτων</a>
+            </div>
+        </div>
+        {% endif %}
+        {% if announcements %}
+        <div class="section-header mt-4 mb-3">
+            <h2 class="section-title">Ανακοινώσεις</h2>
+            {% if current_semester_filter %}<span class="text-muted small fw-normal">({{ current_semester_filter }})</span>{% endif %}
+        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="list-group list-group-flush">
+                {% for ann in announcements %}
+                <div class="list-group-item px-3 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1 fw-semibold small">{{ ann.title }}</h6>
+                            <p class="mb-0 text-muted" style="font-size:.8rem;">{{ ann.content[:120] }}{% if ann.content|length > 120 %}...{% endif %}</p>
+                        </div>
+                        <div class="text-end flex-shrink-0 ms-3">
+                            <span class="badge bg-light text-muted fw-normal" style="font-size:.7rem;">{{ ann.course_name }}</span>
+                            <div class="text-muted" style="font-size:.65rem;">{{ ann.created_at[:10] }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-lg-4">
+        {% include 'dashboard_calendar.html' %}
+        {% if pending_assignments %}
+        <div class="card border-0 shadow-sm mb-4" style="border-left:3px solid #eab308 !important;">
+            <div class="card-body pb-2">
+                <h6 class="fw-semibold small text-muted text-uppercase mb-3" style="letter-spacing:.04em;">Εκκρεμείς Εργασίες</h6>
+                {% for a in pending_assignments %}
+                <a href="{{ url_for('submit_assignment', assignment_id=a.id) }}" class="d-flex align-items-center justify-content-between text-decoration-none py-2 sidebar-item">
+                    <div><div class="fw-medium small text-dark">{{ a.title }}</div><div class="text-muted" style="font-size:.7rem;">{{ a.course_name }}</div></div>
+                    {% if a.due_date %}<span class="badge bg-warning bg-opacity-10 text-warning" style="font-size:.65rem;">{{ a.due_date }}</span>{% endif %}
+                </a>
+                {% if not loop.last %}<hr class="my-0 opacity-10">{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        {% if upcoming_events %}
+        <div class="card border-0 shadow-sm mb-4" style="border-left:3px solid #8B2332 !important;">
+            <div class="card-body pb-2">
+                <h6 class="fw-semibold small text-muted text-uppercase mb-3" style="letter-spacing:.04em;">Επερχόμενα Συμβάντα</h6>
+                {% for e in upcoming_events %}
+                <div class="d-flex align-items-center justify-content-between py-2 sidebar-item">
+                    <div><div class="fw-medium small">{{ e.title }}</div><div class="text-muted" style="font-size:.7rem;">{{ e.course_name }}</div></div>
+                    <span class="badge bg-primary bg-opacity-10 text-primary" style="font-size:.65rem;">{{ e.event_date }}</span>
+                </div>
+                {% if not loop.last %}<hr class="my-0 opacity-10">{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h6 class="fw-semibold small text-muted text-uppercase mb-3" style="letter-spacing:.04em;">Σύνοψη</h6>
+                <div class="d-flex justify-content-between align-items-center py-2"><span class="small text-muted">Μαθήματα</span><span class="fw-semibold small">{{ student_stats.enrolled_courses }}</span></div>
+                <hr class="my-1 opacity-10">
+                <div class="d-flex justify-content-between align-items-center py-2"><span class="small text-muted">Υποβολές Εργασιών</span><span class="fw-semibold small">{{ student_stats.submitted_count }}</span></div>
+                <hr class="my-1 opacity-10">
+                <div class="d-flex justify-content-between align-items-center py-2"><span class="small text-muted">Τεστ</span><span class="fw-semibold small">{{ student_stats.test_attempts }}</span></div>
+                <hr class="my-1 opacity-10">
+                <div class="d-flex justify-content-between align-items-center py-2"><span class="small text-muted">Προσεχή Συμβάντα</span><span class="fw-semibold small">{{ student_stats.upcoming_count }}</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+</div>{# dashboard-main-wrap #}
+</div>

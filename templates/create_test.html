@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Δημιουργία Τεστ{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('tests', course_id=course.id) }}">Τεστ</a></li>
+        <li class="breadcrumb-item active">Νέο Τεστ</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+                    <span class="card-header-icon"><i class="bi bi-pencil-square"></i></span>
+                    Νέο Τεστ Αξιολόγησης
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" id="testForm">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="title" class="form-label fw-semibold">Τίτλος Τεστ *</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="duration" class="form-label fw-semibold">Διάρκεια (λεπτά)</label>
+                            <input type="number" class="form-control" id="duration" name="duration" value="30" min="5">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="description" class="form-label fw-semibold">Περιγραφή</label>
+                        <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+                    </div>
+
+                    <hr>
+                    <h5 class="fw-bold mb-3"><i class="bi bi-question-circle me-2"></i>Ερωτήσεις</h5>
+
+                    <div id="questions-container">
+                        <!-- Ερώτηση 1 - προ-φορτωμένη -->
+                        <div class="question-block card border mb-3" data-question="1">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <strong>Ερώτηση 1</strong>
+                                <button type="button" class="btn btn-outline-danger btn-sm remove-question" style="display:none;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    <label class="form-label">Κείμενο Ερώτησης *</label>
+                                    <input type="text" class="form-control" name="question_1_text" required>
+                                </div>
+                                <div class="row mb-2">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Τύπος</label>
+                                        <select class="form-select question-type" name="question_1_type" data-question="1">
+                                            <option value="multiple_choice">Πολλαπλής Επιλογής</option>
+                                            <option value="true_false">Σωστό / Λάθος</option>
+                                            <option value="short_answer">Σύντομης Απάντησης</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Μονάδες</label>
+                                        <input type="number" class="form-control" name="question_1_points" value="2" min="1">
+                                    </div>
+                                </div>
+                                <div class="options-container" id="options_1">
+                                    <label class="form-label">Επιλογές</label>
+                                    <input type="text" class="form-control mb-1" name="question_1_option_1" placeholder="Επιλογή Α">
+                                    <input type="text" class="form-control mb-1" name="question_1_option_2" placeholder="Επιλογή Β">
+                                    <input type="text" class="form-control mb-1" name="question_1_option_3" placeholder="Επιλογή Γ">
+                                    <input type="text" class="form-control mb-1" name="question_1_option_4" placeholder="Επιλογή Δ">
+                                </div>
+                                <div class="mt-2">
+                                    <label class="form-label">Σωστή Απάντηση *</label>
+                                    <input type="text" class="form-control" name="question_1_correct" required
+                                           placeholder="Πληκτρολογήστε ακριβώς τη σωστή απάντηση">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-primary mb-4" id="addQuestion">
+                        <i class="bi bi-plus-circle me-1"></i>Προσθήκη Ερώτησης
+                    </button>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle me-1"></i>Δημιουργία Τεστ
+                        </button>
+                        <a href="{{ url_for('tests', course_id=course.id) }}" class="btn btn-outline-secondary btn-lg">Ακύρωση</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+let questionCount = 1;
+
+document.getElementById('addQuestion').addEventListener('click', function() {
+    questionCount++;
+    const container = document.getElementById('questions-container');
+    const block = document.createElement('div');
+    block.className = 'question-block card border mb-3';
+    block.dataset.question = questionCount;
+    block.innerHTML = `
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <strong>Ερώτηση ${questionCount}</strong>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-question">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="mb-2">
+                <label class="form-label">Κείμενο Ερώτησης *</label>
+                <input type="text" class="form-control" name="question_${questionCount}_text" required>
+            </div>
+            <div class="row mb-2">
+                <div class="col-md-6">
+                    <label class="form-label">Τύπος</label>
+                    <select class="form-select question-type" name="question_${questionCount}_type" data-question="${questionCount}">
+                        <option value="multiple_choice">Πολλαπλής Επιλογής</option>
+                        <option value="true_false">Σωστό / Λάθος</option>
+                        <option value="short_answer">Σύντομης Απάντησης</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Μονάδες</label>
+                    <input type="number" class="form-control" name="question_${questionCount}_points" value="2" min="1">
+                </div>
+            </div>
+            <div class="options-container" id="options_${questionCount}">
+                <label class="form-label">Επιλογές</label>
+                <input type="text" class="form-control mb-1" name="question_${questionCount}_option_1" placeholder="Επιλογή Α">
+                <input type="text" class="form-control mb-1" name="question_${questionCount}_option_2" placeholder="Επιλογή Β">
+                <input type="text" class="form-control mb-1" name="question_${questionCount}_option_3" placeholder="Επιλογή Γ">
+                <input type="text" class="form-control mb-1" name="question_${questionCount}_option_4" placeholder="Επιλογή Δ">
+            </div>
+            <div class="mt-2">
+                <label class="form-label">Σωστή Απάντηση *</label>
+                <input type="text" class="form-control" name="question_${questionCount}_correct" required
+                       placeholder="Πληκτρολογήστε ακριβώς τη σωστή απάντηση">
+            </div>
+        </div>
+    `;
+    container.appendChild(block);
+
+    // Show remove buttons when more than 1 question
+    document.querySelectorAll('.remove-question').forEach(btn => btn.style.display = 'inline-block');
+});
+
+// Handle question type change
+document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('question-type')) {
+        const qNum = e.target.dataset.question;
+        const optContainer = document.getElementById('options_' + qNum);
+        if (e.target.value === 'short_answer') {
+            optContainer.style.display = 'none';
+        } else if (e.target.value === 'true_false') {
+            optContainer.style.display = 'block';
+            optContainer.innerHTML = `
+                <label class="form-label">Επιλογές</label>
+                <input type="text" class="form-control mb-1" name="question_${qNum}_option_1" value="Σωστό" readonly>
+                <input type="text" class="form-control mb-1" name="question_${qNum}_option_2" value="Λάθος" readonly>
+            `;
+        } else {
+            optContainer.style.display = 'block';
+            optContainer.innerHTML = `
+                <label class="form-label">Επιλογές</label>
+                <input type="text" class="form-control mb-1" name="question_${qNum}_option_1" placeholder="Επιλογή Α">
+                <input type="text" class="form-control mb-1" name="question_${qNum}_option_2" placeholder="Επιλογή Β">
+                <input type="text" class="form-control mb-1" name="question_${qNum}_option_3" placeholder="Επιλογή Γ">
+                <input type="text" class="form-control mb-1" name="question_${qNum}_option_4" placeholder="Επιλογή Δ">
+            `;
+        }
+    }
+});
+
+// Remove question
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.remove-question')) {
+        e.target.closest('.question-block').remove();
+        if (document.querySelectorAll('.question-block').length <= 1) {
+            document.querySelectorAll('.remove-question').forEach(btn => btn.style.display = 'none');
+        }
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

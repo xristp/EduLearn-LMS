@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}UniPi LMS{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}UniPi LMS — Πλατφόρμα Διαχείρισης Μαθημάτων Πανεπιστημίου Πειραιώς. Μαθήματα, υλικό και εργασίες.{% endblock %}">
+    {% block meta_robots %}{% endblock %}
+    {% block canonical %}{% endblock %}
+    {% block og_meta %}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}UniPi LMS{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}UniPi LMS — Πλατφόρμα Διαχείρισης Μαθημάτων Πανεπιστημίου Πειραιώς. Μαθήματα, υλικό και εργασίες.{% endblock %}">
+    <meta property="og:url" content="{{ request.url_root.rstrip('/') }}{{ request.path }}">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ url_for('static', filename='images/unipi-emblem.png') }}">
+    {% endblock %}
+    <meta name="theme-color" content="#8B2332">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/unipi-emblem.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/unipi-emblem.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body class="{% if current_user %}app-with-sidebar{% endif %}{% if not current_user and request.endpoint in ('login', 'register') %} page-auth-banner{% endif %}">
+    {% if current_user %}
+    <!-- Left sidebar navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+        <div class="sidebar-header d-flex align-items-center">
+            <a href="{{ url_for('dashboard') }}" class="sidebar-brand sidebar-brand--full flex-grow-1 min-width-0">
+                <img src="{{ url_for('static', filename='images/logopapei3.png') }}" alt="Πανεπιστήμιο Πειραιώς - University of Piraeus" class="sidebar-brand-full-logo sidebar-logo-expanded" width="180" height="56" fetchpriority="high">
+                <img src="{{ url_for('static', filename='images/unipi-emblem.png') }}" alt="UniPi" class="sidebar-brand-collapsed-logo sidebar-logo-collapsed" width="36" height="36">
+            </a>
+            <button type="button" class="sidebar-toggle-btn" id="sidebar-toggle" aria-label="Σύμπτυξη/Επέκταση πλευρικής μπάρας">
+                <i class="bi bi-chevron-left" id="sidebar-toggle-icon"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                <i class="bi bi-grid-1x2"></i>
+                <span>Πίνακας Ελέγχου</span>
+            </a>
+            <a href="{{ url_for('all_courses') }}" class="sidebar-link {% if request.endpoint == 'all_courses' %}active{% endif %}">
+                <i class="bi bi-journal-bookmark"></i>
+                <span>Μαθήματα</span>
+            </a>
+            {% if current_user.role == 'instructor' %}
+            <a href="{{ url_for('create_course') }}" class="sidebar-link {% if request.endpoint == 'create_course' %}active{% endif %}">
+                <i class="bi bi-plus-circle"></i>
+                <span>Νέο Μάθημα</span>
+            </a>
+            {% endif %}
+
+            <div class="sidebar-semester-wrap">
+                <div class="sidebar-dropdown-toggle d-flex align-items-center justify-content-between" id="semester-dropdown-toggle" data-bs-toggle="collapse" data-bs-target="#semester-dropdown-menu" aria-expanded="false">
+                    <span class="sidebar-dropdown-label"><i class="bi bi-calendar-semester me-1"></i>Εξάμηνο</span>
+                    <i class="bi bi-chevron-down sidebar-dropdown-arrow"></i>
+                </div>
+                <div class="collapse" id="semester-dropdown-menu">
+                    <div class="sidebar-dropdown-inner" data-nav="semester">
+                        <a href="{{ url_for('set_semester') }}" class="sidebar-dropdown-item {% if not current_semester_filter %}active{% endif %}" data-semester="">Όλα</a>
+                        {% for sem in sidebar_semesters %}
+                        <a href="{{ url_for('set_semester', semester=sem) }}" class="sidebar-dropdown-item {% if current_semester_filter == sem %}active{% endif %}" data-semester="{{ sem }}">{{ sem }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            {% set nav_course_id = (request.view_args or {}).get('course_id') or current_course_id_nav %}
+            {% set current_nav_course = sidebar_courses|selectattr('id', 'equalto', nav_course_id)|first if nav_course_id else none %}
+            {% if not current_nav_course and sidebar_courses %}{% set current_nav_course = sidebar_courses[0] %}{% endif %}
+
+            <div class="sidebar-lessons-wrap">
+                <div class="sidebar-lessons-label d-flex align-items-center justify-content-between flex-wrap gap-1">
+                    <span><i class="bi bi-journal-bookmark me-1"></i>Μαθήματα{% if current_semester_filter %} <span class="sidebar-lessons-semester-badge">{{ current_semester_filter }}</span>{% endif %}</span>
+                </div>
+            {% if sidebar_courses %}
+                <div class="sidebar-lessons-list" id="sidebar-lessons-list">
+                    {% for cr in sidebar_courses %}
+                    <a href="{{ url_for('materials', course_id=cr.id) }}" class="sidebar-lesson-link {% if current_nav_course and cr.id == current_nav_course.id %}active{% endif %}" title="{{ cr.name }}{% if cr.semester %} ({{ cr.semester }}){% endif %}">
+                        <i class="bi bi-book"></i>
+                        <span class="sidebar-lesson-name">{{ cr.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="sidebar-lessons-empty">
+                    <p class="sidebar-lessons-empty-text">{% if current_semester_filter %}Δεν υπάρχουν μαθήματα για αυτό το εξάμηνο.{% else %}Δεν έχετε μαθήματα.{% endif %}</p>
+                    {% if current_semester_filter %}
+                    <a href="{{ url_for('set_semester') }}" class="sidebar-lessons-empty-link">Όλα τα μαθήματα</a>
+                    {% else %}
+                    <a href="{{ url_for('all_courses') }}" class="sidebar-lessons-empty-link">Διαθέσιμα μαθήματα</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+            </div>
+            {% if current_nav_course %}
+            <div class="sidebar-utils-wrap">
+                <div class="sidebar-utils-label">Ενότητες</div>
+                <div class="sidebar-utils-list">
+                    <a href="{{ url_for('materials', course_id=current_nav_course.id) }}" class="sidebar-link sidebar-link-sub {% if request.endpoint in ('materials', 'upload_material') and (request.view_args or {}).get('course_id') == current_nav_course.id %}active{% endif %}">
+                        <i class="bi bi-file-earmark"></i><span>Υλικό</span>
+                    </a>
+                    <a href="{{ url_for('announcements', course_id=current_nav_course.id) }}" class="sidebar-link sidebar-link-sub {% if request.endpoint in ('announcements', 'create_announcement') and (request.view_args or {}).get('course_id') == current_nav_course.id %}active{% endif %}">
+                        <i class="bi bi-megaphone"></i><span>Ανακοινώσεις</span>
+                    </a>
+                    <a href="{{ url_for('assignments', course_id=current_nav_course.id) }}" class="sidebar-link sidebar-link-sub {% if request.endpoint in ('assignments', 'create_assignment') and (request.view_args or {}).get('course_id') == current_nav_course.id %}active{% endif %}">
+                        <i class="bi bi-clipboard"></i><span>Εργασίες</span>
+                    </a>
+                    <a href="{{ url_for('tests', course_id=current_nav_course.id) }}" class="sidebar-link sidebar-link-sub {% if request.endpoint in ('tests', 'create_test') and (request.view_args or {}).get('course_id') == current_nav_course.id %}active{% endif %}">
+                        <i class="bi bi-pencil-square"></i><span>Τεστ</span>
+                    </a>
+                    <a href="{{ url_for('discussions', course_id=current_nav_course.id) }}" class="sidebar-link sidebar-link-sub {% if request.endpoint in ('discussions', 'create_discussion', 'discussion_thread') and ((request.view_args or {}).get('course_id') == current_nav_course.id or (request.endpoint == 'discussion_thread' and current_course_id_nav == current_nav_course.id)) %}active{% endif %}">
+                        <i class="bi bi-chat-dots"></i><span>Συζητήσεις</span>
+                    </a>
+                    <a href="{{ url_for('events', course_id=current_nav_course.id) }}" class="sidebar-link sidebar-link-sub {% if request.endpoint in ('events', 'create_event') and (request.view_args or {}).get('course_id') == current_nav_course.id %}active{% endif %}">
+                        <i class="bi bi-calendar-event"></i><span>Συμβάντα</span>
+                    </a>
+                    {% if current_user.role == 'instructor' %}
+                    <a href="{{ url_for('progress', course_id=current_nav_course.id) }}" class="sidebar-link sidebar-link-sub {% if request.endpoint == 'progress' and (request.view_args or {}).get('course_id') == current_nav_course.id %}active{% endif %}">
+                        <i class="bi bi-graph-up"></i><span>Πρόοδος</span>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('grades', course_id=current_nav_course.id) }}" class="sidebar-link sidebar-link-sub {% if request.endpoint == 'grades' and (request.view_args or {}).get('course_id') == current_nav_course.id %}active{% endif %}">
+                        <i class="bi bi-award"></i><span>Βαθμοί</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <span class="sidebar-user-name">{{ current_user.full_name.split(' ')[0] }}</span>
+                <span class="sidebar-user-role">{% if current_user.role == 'instructor' %}Εκπαιδευτής{% else %}Φοιτητής{% endif %}</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="sidebar-link sidebar-link-logout">
+                <i class="bi bi-box-arrow-left"></i>
+                <span>Αποσύνδεση</span>
+            </a>
+        </div>
+    </aside>
+    {% endif %}
+
+    <main class="app-main{% if request.endpoint == 'dashboard' %} app-main--dashboard-banner{% endif %}">
+        {% if current_user %}
+        <div class="app-main-inner" id="app-content-wrap">
+        {% else %}
+        <div class="container py-2" id="app-content-wrap">
+        {% endif %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Κλείσιμο"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <div id="app-content">{% block content %}{% endblock %}</div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

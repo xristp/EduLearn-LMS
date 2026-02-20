@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Νέα Ανακοίνωση{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('announcements', course_id=course.id) }}">Ανακοινώσεις</a></li>
+        <li class="breadcrumb-item active">Νέα Ανακοίνωση</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+                    <span class="card-header-icon"><i class="bi bi-megaphone"></i></span>
+                    Νέα Ανακοίνωση
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-semibold">Τίτλος *</label>
+                        <input type="text" class="form-control" id="title" name="title"
+                               placeholder="Τίτλος ανακοίνωσης" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="content" class="form-label fw-semibold">Περιεχόμενο *</label>
+                        <textarea class="form-control" id="content" name="content" rows="8"
+                                  placeholder="Γράψτε το περιεχόμενο της ανακοίνωσης..." required></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-1"></i>Δημοσίευση
+                        </button>
+                        <a href="{{ url_for('announcements', course_id=course.id) }}" class="btn btn-outline-secondary">Ακύρωση</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

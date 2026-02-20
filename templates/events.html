@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Ημερολόγιο - {{ course.name }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item active">{{ course.name }}</li>
+        <li class="breadcrumb-item active">Ημερολόγιο & Συμβάντα</li>
+    </ol>
+</nav>
+
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-title">Ημερολόγιο & Συμβάντα</h1>
+            <p class="page-subtitle">{{ course.name }}</p>
+        </div>
+        {% if current_user.role == 'instructor' %}
+        <a href="{{ url_for('create_event', course_id=course.id) }}" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i>Νέο
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Υπόμνημα -->
+<div class="mb-4">
+    <span class="badge bg-primary me-2"><i class="bi bi-book me-1"></i>Διάλεξη</span>
+    <span class="badge bg-danger me-2"><i class="bi bi-exclamation-triangle me-1"></i>Προθεσμία</span>
+    <span class="badge bg-warning text-dark me-2"><i class="bi bi-pencil me-1"></i>Εξέταση</span>
+    <span class="badge bg-success me-2"><i class="bi bi-calendar me-1"></i>Γενικό</span>
+</div>
+
+{% if events %}
+<div class="row g-3">
+    {% for event in events %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card border-0 shadow-sm h-100 
+            {% if event.event_type == 'deadline' %}border-top border-danger border-3
+            {% elif event.event_type == 'exam' %}border-top border-warning border-3
+            {% elif event.event_type == 'lecture' %}border-top border-primary border-3
+            {% else %}border-top border-success border-3{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-bold mb-0">{{ event.title }}</h6>
+                    <span class="badge 
+                        {% if event.event_type == 'deadline' %}bg-danger
+                        {% elif event.event_type == 'exam' %}bg-warning text-dark
+                        {% elif event.event_type == 'lecture' %}bg-primary
+                        {% else %}bg-success{% endif %}">
+                        {% if event.event_type == 'deadline' %}Προθεσμία
+                        {% elif event.event_type == 'exam' %}Εξέταση
+                        {% elif event.event_type == 'lecture' %}Διάλεξη
+                        {% else %}Γενικό{% endif %}
+                    </span>
+                </div>
+                {% if event.description %}
+                <p class="text-muted small mb-2">{{ event.description }}</p>
+                {% endif %}
+                <div class="mt-2">
+                    <span class="fw-semibold text-primary">
+                        <i class="bi bi-calendar3 me-1"></i>{{ event.event_date }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 text-muted">
+    <i class="bi bi-calendar-x fs-1"></i>
+    <p class="mt-2">Δεν υπάρχουν συμβάντα ακόμα.</p>
+</div>
+{% endif %}
+{% endblock %}

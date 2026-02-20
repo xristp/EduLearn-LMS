@@ -1,0 +1,52 @@
+# ---- Environment & secrets (never commit) ----
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ---- Python ----
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# ---- Database (recreated on first run) ----
+lms.db
+*.sqlite3
+
+# ---- User uploads (keep folder, ignore contents) ----
+uploads/*
+!uploads/.gitkeep
+
+# ---- IDE / editor ----
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.cursor/
+
+# ---- OS ----
+.DS_Store
+Thumbs.db
+
+# ---- Logs & temp ----
+*.log
+logs/
+
+# ---- Testing (if added later) ----
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# ---- Optional: uncomment if you use Node/npm ----
+# node_modules/

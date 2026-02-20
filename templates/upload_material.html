@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Ανάρτηση Υλικού{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Πίνακας Ελέγχου</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('materials', course_id=course.id) }}">Υλικό</a></li>
+        <li class="breadcrumb-item active">Ανάρτηση Υλικού</li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header">
+                <h5 class="mb-0 fw-semibold d-flex align-items-center gap-2">
+                    <span class="card-header-icon"><i class="bi bi-upload"></i></span>
+                    Ανάρτηση Υλικού
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-semibold">Τίτλος *</label>
+                        <input type="text" class="form-control" id="title" name="title"
+                               placeholder="π.χ. Εισαγωγή στους Αλγορίθμους" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-semibold">Περιγραφή</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"
+                                  placeholder="Σύντομη περιγραφή του υλικού"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="material_type" class="form-label fw-semibold">Τύπος Υλικού</label>
+                        <select class="form-select" id="material_type" name="material_type">
+                            <option value="document">Έγγραφο (PDF, DOC)</option>
+                            <option value="presentation">Παρουσίαση (PPT)</option>
+                            <option value="video">Βίντεο</option>
+                            <option value="image">Εικόνα</option>
+                            <option value="other">Άλλο</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="file" class="form-label fw-semibold">Αρχείο</label>
+                        <input type="file" class="form-control" id="file" name="file"
+                               accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.png,.jpg,.jpeg,.gif,.mp4,.zip">
+                        <small class="text-muted">Μέγιστο μέγεθος: 16MB | Επιτρεπτοί τύποι: PDF, DOC, PPT, εικόνες, βίντεο, ZIP</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="url" class="form-label fw-semibold">Σύνδεσμος URL (προαιρετικό)</label>
+                        <input type="url" class="form-control" id="url" name="url"
+                               placeholder="https://example.com/resource">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-1"></i>Ανάρτηση
+                        </button>
+                        <a href="{{ url_for('materials', course_id=course.id) }}" class="btn btn-outline-secondary">Ακύρωση</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
