@@ -21,6 +21,20 @@
 
 ---
 
+## 🚀 LIVE DEPLOYMENT
+
+<div align="center" style="background-color: #FFD700; padding: 20px; border-radius: 10px; margin: 20px 0;">
+
+### 📱 **Δείτε την εφαρμογή LIVE εδώ:**
+
+# [🔗 https://edu-learn-lms.vercel.app](https://edu-learn-lms.vercel.app)
+
+**Έτοιμο για Demo!** — Σχεδιασμένο και αναπτυγμένο για production με Vercel deployment.
+
+</div>
+
+---
+
 ## Περιγραφή
 
 Ολοκληρωμένη, production-grade web εφαρμογή **Συστήματος Διαχείρισης Μάθησης (LMS)**, σχεδιασμένη και υλοποιημένη εξ αρχής στα πλαίσια της εργασίας 8 μονάδων (**Θέμα 2 — Ανάπτυξη Ηλεκτρονικού Συστήματος Διαχείρισης Μάθησης**).
