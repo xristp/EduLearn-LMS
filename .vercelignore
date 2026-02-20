@@ -1,0 +1,13 @@
+# Αρχεία που δεν χρειάζονται στο Vercel deployment
+copy_logo.py
+__pycache__/
+*.pyc
+.env
+.env.local
+lms.db
+uploads/*
+.git/
+.vscode/
+.cursor/
+.idea/
+RULES.md

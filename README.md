@@ -74,6 +74,44 @@ python app.py
 
 ---
 
+## Deploy στο Vercel
+
+Η εφαρμογή είναι έτοιμη για deployment στο [Vercel](https://vercel.com) ως Python serverless function.
+
+### Βήματα
+
+```bash
+# 1. Εγκατάσταση Vercel CLI (αν δεν υπάρχει)
+npm i -g vercel
+
+# 2. Deploy
+vercel
+
+# 3. Production deploy
+vercel --prod
+```
+
+Εναλλακτικά, συνδέστε το GitHub repository στο [vercel.com/dashboard](https://vercel.com/dashboard) για αυτόματο deploy σε κάθε push.
+
+### Τι γίνεται αυτόματα
+
+- Η βάση δεδομένων (SQLite) δημιουργείται στο `/tmp` με demo δεδομένα σε κάθε cold start
+- Η αρχικοποίηση τρέχει σε module-level — λειτουργεί χωρίς `__main__`
+- Static files (CSS, JS, εικόνες) σερβίρονται κανονικά μέσω Flask
+- Uploads αποθηκεύονται στο `/tmp/uploads` (δεν παραμένουν μεταξύ cold starts — αναμενόμενο για serverless)
+
+### Environment Variables (προαιρετικά)
+
+Στο Vercel Dashboard → Settings → Environment Variables, μπορείτε να ορίσετε:
+
+| Μεταβλητή | Περιγραφή |
+|---|---|
+| `SECRET_KEY` | Κλειδί κρυπτογράφησης session (συνιστάται για production) |
+
+> **Σημείωση:** Η μεταβλητή `VERCEL` ορίζεται αυτόματα από το Vercel — η εφαρμογή την αναγνωρίζει και χρησιμοποιεί `/tmp` αντί για το read-only filesystem.
+
+---
+
 ## Λογαριασμοί
 
 | Ρόλος | Username | Password |

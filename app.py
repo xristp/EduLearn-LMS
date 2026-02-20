@@ -50,10 +50,16 @@ if os.environ.get('FLASK_ENV') == 'production':
 
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt', 'png', 'jpg', 'jpeg', 'gif', 'mp4', 'zip'}
 
+DB_PATH = os.environ.get('DATABASE_URL') or os.environ.get('DB_PATH') or os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lms.db')
+
+# Vercel serverless: χρήση /tmp για εγγράψιμο filesystem (το project filesystem είναι read-only)
+if os.environ.get('VERCEL'):
+    DB_PATH = '/tmp/lms.db'
+    app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
+    app.config['DEBUG'] = False
+
 # Δημιουργία φακέλου uploads αν δεν υπάρχει
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-DB_PATH = os.environ.get('DATABASE_URL') or os.environ.get('DB_PATH') or os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lms.db')
 
 
 # Βοηθητικές συναρτήσεις για τη βάση δεδομένων
@@ -1990,15 +1996,18 @@ def server_error(e):
     return render_template('errors/500.html'), 500
 
 
-# Εκκινηση
+# --- Αρχικοποίηση βάσης δεδομένων (module-level: λειτουργεί και σε Vercel serverless και τοπικά) ---
+init_db()
+ensure_second_semester_course()
+ensure_semesters_earino_ximerino()
+
+
+# Εκκινηση (τοπική ανάπτυξη)
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     if os.environ.get('FLASK_ENV') == 'production' and (not os.environ.get('SECRET_KEY') and not os.environ.get('FLASK_SECRET_KEY')):
         print("  WARNING: FLASK_ENV=production but SECRET_KEY not set. Set SECRET_KEY in .env for production!")
-    init_db()
-    ensure_second_semester_course()
-    ensure_semesters_earino_ximerino()
     print("\n" + "=" * 60)
     print("  LMS - Learning Management System")
     print("  UniPi")
