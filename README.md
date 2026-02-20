@@ -21,13 +21,13 @@
 
 ---
 
-## 🚀 LIVE DEPLOYMENT
+## LIVE DEPLOYMENT
 
 <div align="center" style="background-color: #FFD700; padding: 20px; border-radius: 10px; margin: 20px 0;">
 
-### 📱 **Δείτε την εφαρμογή LIVE εδώ:**
+### **Δείτε την εφαρμογή LIVE εδώ:**
 
-# [🔗 https://edu-learn-lms.vercel.app](https://edu-learn-lms.vercel.app)
+# [https://edu-learn-lms.vercel.app](https://edu-learn-lms.vercel.app)
 
 **Έτοιμο για Demo!** — Σχεδιασμένο και αναπτυγμένο για production με Vercel deployment.
 
